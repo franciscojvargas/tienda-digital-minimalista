@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "comprobar": "node scripts/comprobar.mjs",
+    "ventas": "node scripts/exportar-ventas.mjs"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.0.0",

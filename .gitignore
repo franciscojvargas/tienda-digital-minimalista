@@ -9,3 +9,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Exportaciones de ventas: contienen datos personales de compradores
+ventas-*.csv

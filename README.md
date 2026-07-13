@@ -133,7 +133,7 @@ y la renuncia. La plantilla lo cubre en dos niveles:
 | Vendes solo a España | IVA 21% incluido en el precio. Declaras con el modelo 303 (trimestral) y 130 (IRPF). Con un gestor, esto es rutina. |
 | Vendes a otros países UE < 10.000 €/año | Puedes seguir aplicando IVA español. |
 | Superas 10.000 €/año en UE | Debes cobrar el IVA del país del comprador: date de alta en **OSS** (ventanilla única, modelo 369) y activa `stripeTax: true` en `config.mjs` (con Stripe Tax activo en el Dashboard) — calcula el IVA correcto por país automáticamente. |
-| Facturas | Desde julio de 2026 los autónomos necesitan software de facturación certificado (**Verifactu**). Las facturas de Stripe no valen por sí solas: usa un software certificado (Holded, Quipu…) o deja que tu gestor las emita. El Dashboard de Stripe te da el registro de todas las ventas (busca por `CMD-XXXXXX`). |
+| Facturas | Ver la sección [Facturación y Verifactu](#-facturación-y-verifactu) — la plantilla incluye `npm run ventas` para dárselo hecho a tu gestor. |
 
 ### Resumen: quién hace qué
 
@@ -149,6 +149,64 @@ y la renuncia. La plantilla lo cubre en dos niveles:
 **Ventaja de esta arquitectura**: sin cookies de seguimiento ni analítica no necesitas banner
 de cookies, y al no almacenar tarjetas ni cuentas de usuario, tu superficie de riesgo RGPD es
 mínima (solo email y teléfono, tratados por Stripe y Resend como encargados).
+
+---
+
+## 🧾 Facturación y Verifactu
+
+**Lo claro primero**: desde julio de 2026 los autónomos deben emitir facturas con software
+certificado (**Verifactu** — registros encadenados, QR y comunicación con la AEAT). Esta
+plantilla **no emite facturas, y es a propósito**: un sistema Verifactu casero no se puede
+certificar (exige registros encadenados inalterables — imposible sin base de datos) y una
+factura no certificada te expone en vez de protegerte.
+
+Lo que sí hace la plantilla es dejarte la facturación a **un comando de distancia**:
+
+```bash
+npm run ventas                    # ventas pagadas del mes actual → CSV
+npm run ventas -- --mes 2026-06   # un mes concreto
+```
+
+Genera `ventas-AAAA-MM.csv` (formato español: `;` y coma decimal, abre directo en Excel) con
+fecha, nº de pedido, producto, importe, impuestos, email, teléfono y país de cada venta,
+sacado directamente de Stripe — que es tu registro de ventas real, sin base de datos propia.
+
+Con ese CSV tienes dos caminos:
+
+1. **Gestor** (recomendado para empezar): le envías el CSV cada mes/trimestre y él emite las
+   facturas con su software certificado y presenta tus modelos (303, 130). Cero herramientas
+   por tu parte.
+2. **Software certificado propio**: importa el CSV (o conecta Stripe directamente) en
+   Holded, Quipu, Billin o la aplicación gratuita de facturación de la AEAT, y emite ahí
+   las facturas.
+
+> Nota: los CSV contienen datos personales de compradores — ya están excluidos de git
+> (`.gitignore`) y no debes compartirlos fuera de tu gestor/software de facturación.
+
+---
+
+## ✅ Checklist de lanzamiento (de cero a vender legal)
+
+Ejecuta `npm run comprobar` en cualquier momento: revisa claves, productos, datos legales y
+verifica **contra las APIs reales** de Stripe y Resend que todo funciona (precios existentes,
+importes coincidentes, dominio de email verificado…). No te deja dudas de qué falta.
+
+```bash
+npm run comprobar
+```
+
+- [ ] **Gestor**: alta censal (036) + RETA antes de la primera venta real
+- [ ] `src/config.mjs`: nombre de la tienda, email de soporte y bloque `legal` (nombre, NIF, dirección)
+- [ ] `src/data/productos.json`: tus productos con sus `price_id` reales de Stripe (precios **IVA incluido**) y `url_descarga` reales
+- [ ] `.env`: las 3 claves (Stripe secreta, webhook, Resend)
+- [ ] Dominio verificado en Resend + `FROM_EMAIL` en `.env`
+- [ ] Leer y ajustar `/aviso-legal`, `/privacidad` y `/terminos` (generados con tus datos)
+- [ ] URL de términos en Stripe (*Settings → Business → Public details*) → `consentimientoTerminos: true`
+- [ ] `npm run comprobar` → todo ✅
+- [ ] Compra de prueba completa con tarjeta `4242 4242 4242 4242` (¿llegan los 2 emails?)
+- [ ] Desplegar en Vercel + webhook de producción + variables de entorno
+- [ ] Cambiar a claves `sk_live_` y hacer una compra real pequeña
+- [ ] Cada mes/trimestre: `npm run ventas` → CSV al gestor
 
 ---
 

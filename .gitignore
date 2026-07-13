@@ -1,0 +1,11 @@
+# Dependencias y build
+node_modules/
+dist/
+.astro/
+.vercel/
+.netlify/
+
+# Secretos: NUNCA subir al repositorio
+.env
+.env.*
+!.env.example

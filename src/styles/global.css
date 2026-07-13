@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fuentes de sistema: cero descargas, cero FOUT, render inmediato. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

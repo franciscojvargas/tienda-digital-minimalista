@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TIENDA } from '../config.mjs';
+// Página 100% estática: el número de pedido llega como parámetro en la URL
+// (?pedido=CMD-XXXXXX), generado por el servidor al crear la sesión de pago.
+---
+
+<Layout title="¡Gracias por tu compra!" description="Pago completado con éxito." noindex>
+  <section class="mx-auto max-w-lg px-6 py-24 text-center">
+    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+      <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+    </div>
+
+    <h1 class="mt-8 text-3xl font-bold tracking-tight">¡Pago completado!</h1>
+    <p class="mt-3 text-stone-500">
+      Gracias por tu compra. Hemos enviado la confirmación y tu producto a tu correo electrónico.
+    </p>
+
+    <div class="mt-8 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
+      <p class="text-xs uppercase tracking-widest text-stone-400">Tu número de pedido</p>
+      <p id="numero-pedido" class="mt-2 text-2xl font-mono font-bold tracking-wider text-emerald-600">
+        #—
+      </p>
+    </div>
+
+    <p class="mt-6 text-xs text-stone-400 leading-relaxed">
+      Guarda este número. Si necesitas soporte, escribe a
+      <a href={`mailto:${TIENDA.emailSoporte}`} class="underline hover:text-stone-600">{TIENDA.emailSoporte}</a>
+      indicando tu número de pedido.
+    </p>
+
+    <a
+      href="/"
+      class="mt-10 inline-block rounded-xl border border-stone-300 px-6 py-3 text-sm font-medium transition hover:bg-stone-100"
+    >
+      Volver a la tienda
+    </a>
+  </section>
+</Layout>
+
+<script>
+  // Leemos el número de pedido de la URL. Si alguien llega sin haber pagado
+  // (sin parámetro), le devolvemos a la portada.
+  const parametros = new URLSearchParams(window.location.search);
+  const pedido = parametros.get('pedido');
+
+  if (pedido && /^CMD-[A-Z0-9]{6}$/.test(pedido)) {
+    document.getElementById('numero-pedido').textContent = `#${pedido}`;
+  } else {
+    window.location.replace('/');
+  }
+</script>

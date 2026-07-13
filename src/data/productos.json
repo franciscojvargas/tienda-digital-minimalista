@@ -1,0 +1,26 @@
+[
+  {
+    "id": "guia-productividad",
+    "nombre": "Guía de Productividad Digital",
+    "descripcion": "Ebook de 120 páginas con sistemas probados para organizar tu trabajo, eliminar distracciones y duplicar tu rendimiento diario.",
+    "precio": 20,
+    "stripe_price_id": "price_REEMPLAZAR_PRODUCTO_1",
+    "url_descarga": "https://example.com/descargas/guia-productividad.pdf"
+  },
+  {
+    "id": "pack-plantillas",
+    "nombre": "Pack de Plantillas Notion Pro",
+    "descripcion": "Colección de 15 plantillas premium para gestionar proyectos, finanzas personales y hábitos. Listas para importar en un clic.",
+    "precio": 25,
+    "stripe_price_id": "price_REEMPLAZAR_PRODUCTO_2",
+    "url_descarga": "https://example.com/descargas/pack-plantillas.zip"
+  },
+  {
+    "id": "curso-automatizacion",
+    "nombre": "Mini-curso de Automatización",
+    "descripcion": "Curso en vídeo de 3 horas: automatiza tareas repetitivas con herramientas no-code y recupera 5 horas a la semana.",
+    "precio": 30,
+    "stripe_price_id": "price_REEMPLAZAR_PRODUCTO_3",
+    "url_descarga": "https://example.com/descargas/curso-automatizacion"
+  }
+]

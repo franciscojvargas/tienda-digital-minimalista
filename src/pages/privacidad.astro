@@ -1,0 +1,78 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TIENDA } from '../config.mjs';
+// Plantilla genérica de política de privacidad (RGPD + LOPDGDD),
+// ajustada a lo que esta tienda realmente hace: solo email y teléfono
+// para procesar el pedido. Punto de partida, no asesoramiento jurídico.
+const { legal } = TIENDA;
+---
+
+<Layout title={`Política de privacidad — ${TIENDA.nombre}`} noindex>
+  <section class="prosa-legal mx-auto max-w-2xl px-6 py-16">
+    <h1>Política de privacidad</h1>
+    <p>Última actualización: julio de 2026</p>
+
+    <h2>1. Responsable del tratamiento</h2>
+    <ul>
+      <li><strong>Responsable:</strong> {legal.nombreLegal} — NIF {legal.nif}</li>
+      <li><strong>Domicilio:</strong> {legal.direccion}</li>
+      <li><strong>Email:</strong> <a href={`mailto:${TIENDA.emailSoporte}`}>{TIENDA.emailSoporte}</a></li>
+    </ul>
+
+    <h2>2. Qué datos tratamos y para qué</h2>
+    <p>
+      Esta tienda pide los datos mínimos imprescindibles para completar una compra: tu
+      <strong>correo electrónico</strong> y tu <strong>número de teléfono</strong>, que
+      introduces directamente en la pasarela de pago de Stripe. Se usan exclusivamente para:
+    </p>
+    <ul>
+      <li>Procesar el pago y entregarte el producto adquirido.</li>
+      <li>Enviarte la confirmación del pedido por email.</li>
+      <li>Atender tus solicitudes de soporte.</li>
+    </ul>
+    <p>
+      No usamos tus datos para publicidad, no los vendemos y este sitio no utiliza cookies
+      propias ni de seguimiento.
+    </p>
+
+    <h2>3. Base legal</h2>
+    <p>
+      La base legal del tratamiento es la <strong>ejecución del contrato de compraventa</strong>
+      (art. 6.1.b RGPD) y el cumplimiento de obligaciones legales, fiscales y contables
+      (art. 6.1.c RGPD).
+    </p>
+
+    <h2>4. Destinatarios: quién más ve tus datos</h2>
+    <ul>
+      <li>
+        <strong>Stripe Payments Europe, Ltd.</strong> — procesa el pago. Los datos de tu
+        tarjeta los trata únicamente Stripe; nunca llegan a nuestros sistemas.
+        <a href="https://stripe.com/es/privacy" rel="noopener">Política de privacidad de Stripe</a>.
+      </li>
+      <li>
+        <strong>Resend</strong> — servicio de envío de los emails transaccionales
+        (confirmación de pedido). <a href="https://resend.com/legal/privacy-policy" rel="noopener">Política de privacidad de Resend</a>.
+      </li>
+    </ul>
+    <p>
+      Estos proveedores pueden implicar transferencias internacionales de datos a EE. UU.,
+      amparadas en el Marco de Privacidad de Datos UE-EE. UU. (Data Privacy Framework) o en
+      cláusulas contractuales tipo.
+    </p>
+
+    <h2>5. Conservación</h2>
+    <p>
+      Los datos asociados a compras se conservan durante los plazos exigidos por la normativa
+      fiscal y contable (con carácter general, un mínimo de 4 años a efectos tributarios).
+    </p>
+
+    <h2>6. Tus derechos</h2>
+    <p>
+      Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y
+      portabilidad escribiendo a
+      <a href={`mailto:${TIENDA.emailSoporte}`}>{TIENDA.emailSoporte}</a>. Si consideras que el
+      tratamiento no es correcto, puedes reclamar ante la
+      <a href="https://www.aepd.es" rel="noopener">Agencia Española de Protección de Datos</a>.
+    </p>
+  </section>
+</Layout>

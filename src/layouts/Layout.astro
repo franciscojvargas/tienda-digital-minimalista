@@ -39,6 +39,11 @@ const { title, description = TIENDA.descripcion, noindex = false } = Astro.props
 
     <footer class="border-t border-stone-200 bg-white">
       <div class="mx-auto max-w-5xl px-6 py-6 text-center text-xs text-stone-400">
+        <nav class="mb-2 flex justify-center gap-4">
+          <a href="/aviso-legal" class="hover:text-stone-600 underline-offset-2 hover:underline">Aviso legal</a>
+          <a href="/privacidad" class="hover:text-stone-600 underline-offset-2 hover:underline">Privacidad</a>
+          <a href="/terminos" class="hover:text-stone-600 underline-offset-2 hover:underline">Términos de venta</a>
+        </nav>
         © {new Date().getFullYear()} {TIENDA.nombre} — Entrega inmediata · Sin registro · Soporte: {TIENDA.emailSoporte}
       </div>
     </footer>

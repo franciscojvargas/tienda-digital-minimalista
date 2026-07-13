@@ -1,0 +1,84 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TIENDA } from '../config.mjs';
+// Plantilla genérica de condiciones de venta para productos digitales
+// de entrega inmediata, con la cláusula de desistimiento del art. 103.m
+// LGDCU. Punto de partida, no asesoramiento jurídico.
+const { legal } = TIENDA;
+---
+
+<Layout title={`Términos y condiciones — ${TIENDA.nombre}`} noindex>
+  <section class="prosa-legal mx-auto max-w-2xl px-6 py-16">
+    <h1>Términos y condiciones de venta</h1>
+    <p>Última actualización: julio de 2026</p>
+
+    <h2>1. Identificación del vendedor</h2>
+    <p>
+      {legal.nombreLegal}, NIF {legal.nif}, con domicilio en {legal.direccion}.
+      Contacto: <a href={`mailto:${TIENDA.emailSoporte}`}>{TIENDA.emailSoporte}</a>.
+    </p>
+
+    <h2>2. Productos y precios</h2>
+    <p>
+      Esta tienda vende productos digitales (contenido descargable o de acceso en línea).
+      Todos los precios se muestran en euros e <strong>incluyen el IVA</strong> aplicable.
+      El precio válido es el mostrado en el momento de confirmar la compra.
+    </p>
+
+    <h2>3. Proceso de compra y pago</h2>
+    <p>
+      El pago se realiza mediante tarjeta a través de <strong>Stripe Checkout</strong>. Para
+      completar la compra solo se solicitan correo electrónico, teléfono y datos de pago.
+      Tras el pago recibirás por email la confirmación con tu número de pedido y el acceso
+      al producto.
+    </p>
+
+    <h2>4. Entrega</h2>
+    <p>
+      La entrega es <strong>inmediata y por vía electrónica</strong>: al completar el pago
+      recibirás en tu correo el enlace de descarga o las instrucciones de acceso. Si no lo
+      recibes en unos minutos, revisa la carpeta de spam y, si no aparece, escríbenos
+      indicando tu número de pedido.
+    </p>
+
+    <h2>5. Derecho de desistimiento</h2>
+    <p>
+      De acuerdo con el artículo 103.m) del Real Decreto Legislativo 1/2007 (Ley General para
+      la Defensa de los Consumidores y Usuarios), el derecho de desistimiento de 14 días
+      <strong>no es aplicable</strong> al suministro de contenido digital sin soporte material
+      cuya ejecución comienza inmediatamente tras el pago.
+    </p>
+    <p>
+      Al realizar la compra, <strong>consientes expresamente que la entrega del contenido
+      digital se inicie de forma inmediata y reconoces que, con ello, pierdes tu derecho de
+      desistimiento</strong>.
+    </p>
+    <p>
+      Lo anterior no afecta a tus derechos como consumidor en caso de producto defectuoso o
+      no conforme: si el contenido no funciona o no se corresponde con lo descrito,
+      contáctanos y lo solucionaremos o te devolveremos el importe.
+    </p>
+
+    <h2>6. Licencia de uso</h2>
+    <p>
+      La compra otorga una licencia de uso <strong>personal, no exclusiva e intransferible</strong>.
+      No está permitida la reventa, redistribución ni publicación del contenido sin
+      autorización expresa del vendedor.
+    </p>
+
+    <h2>7. Soporte y reclamaciones</h2>
+    <p>
+      Para soporte o reclamaciones, escribe a
+      <a href={`mailto:${TIENDA.emailSoporte}`}>{TIENDA.emailSoporte}</a> indicando tu número
+      de pedido (formato #CMD-XXXXXX). También puedes acudir a las autoridades de consumo de
+      tu comunidad autónoma o a la plataforma europea de
+      <a href="https://consumer-redress.ec.europa.eu" rel="noopener">resolución de litigios</a>.
+    </p>
+
+    <h2>8. Legislación aplicable</h2>
+    <p>
+      Estas condiciones se rigen por la legislación española. Para consumidores, la
+      jurisdicción competente será la de su domicilio.
+    </p>
+  </section>
+</Layout>

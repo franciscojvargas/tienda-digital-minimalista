@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { randomUUID } from 'node:crypto';
 import { STRIPE_SECRET_KEY } from 'astro:env/server';
 import { buscarProducto } from '../../lib/productos.js';
+import { TIENDA } from '../../config.mjs';
 
 // Endpoint serverless: se ejecuta bajo demanda, nunca se prerenderiza.
 export const prerender = false;
@@ -99,7 +100,7 @@ export async function POST({ request, clientAddress }) {
   const numeroPedido = generarNumeroPedido();
 
   try {
-    const sesion = await stripe.checkout.sessions.create({
+    const opcionesSesion = {
       mode: 'payment',
 
       // Solo tarjeta: pago síncrono garantizado. Así el evento
@@ -129,7 +130,31 @@ export async function POST({ request, clientAddress }) {
 
       success_url: `${origen}/gracias?pedido=${numeroPedido}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origen}/`,
-    });
+
+      // Renuncia al desistimiento (art. 103.m LGDCU): contenido digital
+      // de entrega inmediata. Visible junto al botón de pago y queda
+      // registrado en la sesión de Stripe como prueba.
+      custom_text: {
+        submit: {
+          message: `Producto digital de entrega inmediata: al pagar consientes que la entrega comience al instante y renuncias al derecho de desistimiento de 14 días. Condiciones: ${origen}/terminos`,
+        },
+      },
+    };
+
+    // Checkbox obligatorio de aceptación de términos. Requiere haber
+    // configurado la URL de términos en el Dashboard de Stripe
+    // (Settings → Business → Public details). Se activa en config.mjs.
+    if (TIENDA.legal.consentimientoTerminos) {
+      opcionesSesion.consent_collection = { terms_of_service: 'required' };
+    }
+
+    // IVA automático según el país del comprador (régimen OSS).
+    // Requiere Stripe Tax activo y precios "IVA incluido" en el Dashboard.
+    if (TIENDA.legal.stripeTax) {
+      opcionesSesion.automatic_tax = { enabled: true };
+    }
+
+    const sesion = await stripe.checkout.sessions.create(opcionesSesion);
 
     return respuestaJson({ url: sesion.url }, 200);
   } catch (error) {

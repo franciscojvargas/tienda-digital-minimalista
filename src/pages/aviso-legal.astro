@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { TIENDA } from '../config.mjs';
+// Plantilla genérica de aviso legal (art. 10 LSSI-CE). Los datos salen
+// de src/config.mjs → legal. Revísala antes de vender: es un punto de
+// partida, no asesoramiento jurídico.
+const { legal } = TIENDA;
+---
+
+<Layout title={`Aviso legal — ${TIENDA.nombre}`} noindex>
+  <section class="prosa-legal mx-auto max-w-2xl px-6 py-16">
+    <h1>Aviso legal</h1>
+    <p>Última actualización: julio de 2026</p>
+
+    <h2>1. Titular del sitio web</h2>
+    <p>
+      En cumplimiento del artículo 10 de la Ley 34/2002, de Servicios de la Sociedad de la
+      Información y de Comercio Electrónico (LSSI-CE), se informa de que el titular de este
+      sitio web es:
+    </p>
+    <ul>
+      <li><strong>Titular:</strong> {legal.nombreLegal}</li>
+      <li><strong>NIF:</strong> {legal.nif}</li>
+      <li><strong>Domicilio:</strong> {legal.direccion}</li>
+      <li><strong>Email de contacto:</strong> <a href={`mailto:${TIENDA.emailSoporte}`}>{TIENDA.emailSoporte}</a></li>
+    </ul>
+
+    <h2>2. Objeto</h2>
+    <p>
+      Este sitio web tiene por objeto la venta de productos digitales de descarga o acceso
+      inmediato. Las condiciones aplicables a cada compra se recogen en los
+      <a href="/terminos">Términos y condiciones de venta</a>.
+    </p>
+
+    <h2>3. Propiedad intelectual</h2>
+    <p>
+      Los contenidos de este sitio y los productos digitales comercializados están protegidos
+      por derechos de propiedad intelectual. La compra otorga una licencia de uso personal e
+      intransferible; queda prohibida su reventa, redistribución o comunicación pública sin
+      autorización expresa del titular.
+    </p>
+
+    <h2>4. Responsabilidad</h2>
+    <p>
+      El titular no se hace responsable del mal uso de los contenidos de este sitio web ni de
+      los daños derivados de causas ajenas a su control (fallos de red, del dispositivo del
+      usuario o de servicios de terceros).
+    </p>
+
+    <h2>5. Legislación aplicable</h2>
+    <p>
+      La relación entre el titular y los usuarios se rige por la legislación española. Para
+      consumidores, cualquier controversia podrá someterse además a la
+      <a href="https://consumo.gob.es" rel="noopener">plataforma de resolución de litigios de consumo</a>.
+    </p>
+  </section>
+</Layout>

@@ -66,9 +66,11 @@ Listo. Estás vendiendo.
 | Quiero cambiar… | Archivo |
 |---|---|
 | Nombre de la tienda, email de soporte, titular, moneda | `src/config.mjs` |
+| Datos legales (nombre, NIF, dirección) e interruptores fiscales | `src/config.mjs` → bloque `legal` |
 | Productos: nombre, descripción, precio, link de descarga | `src/data/productos.json` |
 | Colores / estilos | Clases Tailwind en `src/pages/index.astro` y `src/layouts/Layout.astro` |
 | Textos de los emails | `src/lib/emails.js` |
+| Textos legales (aviso legal, privacidad, términos) | `src/pages/aviso-legal.astro`, `privacidad.astro`, `terminos.astro` |
 
 ### Añadir un producto
 
@@ -91,6 +93,62 @@ El catálogo se valida en cada build: si te equivocas en un campo, el build fall
 
 - **Con `url_descarga`**: el email de confirmación incluye un botón "Descargar tu producto". Vale cualquier URL https: Dropbox, Google Drive, un bucket S3/R2, tu propio hosting…
 - **Sin el campo**: el email dice que recibirá el acceso en breve — útil si entregas a mano (acceso a Notion, invitación a comunidad, etc.).
+
+---
+
+## ⚖️ Vender legalmente desde España — paso a paso
+
+> ⚠️ Esto es un resumen orientativo para autónomos, no asesoramiento jurídico ni fiscal.
+> Confirma tu caso con un gestor **antes de la primera venta real** — es una consulta barata
+> que evita sanciones caras.
+
+### Antes de vender (obligatorio)
+
+1. **Alta en Hacienda** — modelo 036/037 (alta censal, gratis, online) antes de la primera venta.
+2. **Alta en RETA** (Seguridad Social) si la actividad es habitual. Con tarifa plana,
+   ~87 €/mes el primer año. Vender de forma continuada sin alta = riesgo de sanción + cuotas atrasadas.
+3. **Rellena el bloque `legal` de `src/config.mjs`** (nombre, NIF, dirección) — las páginas
+   `/aviso-legal`, `/privacidad` y `/terminos` se generan solas con tus datos y ya están
+   enlazadas en el pie de página. Publicar la identidad del titular es obligatorio (art. 10 LSSI).
+4. **Precios con IVA incluido**: en ventas a consumidores, el precio mostrado debe ser el
+   final. Los precios que pongas en `productos.json` y en Stripe deben llevar el IVA dentro
+   (en Stripe, crea los precios con *tax behavior: inclusive*).
+
+### Derecho de desistimiento (ya resuelto en el código)
+
+Los productos digitales de entrega inmediata están **exentos** de los 14 días de devolución
+(art. 103.m LGDCU), pero solo si el comprador **consiente expresamente** la entrega inmediata
+y la renuncia. La plantilla lo cubre en dos niveles:
+
+- El aviso de renuncia aparece **junto al botón de pago** en Stripe Checkout (siempre activo)
+  y queda registrado en la sesión como prueba.
+- Para máxima solidez, activa el **checkbox obligatorio**: pon la URL de tus términos en
+  Stripe (*Settings → Business → Public details → Terms of service*) y cambia
+  `consentimientoTerminos: true` en `src/config.mjs`.
+
+### IVA e impuestos (cuándo activar qué)
+
+| Situación | Qué hacer |
+|---|---|
+| Vendes solo a España | IVA 21% incluido en el precio. Declaras con el modelo 303 (trimestral) y 130 (IRPF). Con un gestor, esto es rutina. |
+| Vendes a otros países UE < 10.000 €/año | Puedes seguir aplicando IVA español. |
+| Superas 10.000 €/año en UE | Debes cobrar el IVA del país del comprador: date de alta en **OSS** (ventanilla única, modelo 369) y activa `stripeTax: true` en `config.mjs` (con Stripe Tax activo en el Dashboard) — calcula el IVA correcto por país automáticamente. |
+| Facturas | Desde julio de 2026 los autónomos necesitan software de facturación certificado (**Verifactu**). Las facturas de Stripe no valen por sí solas: usa un software certificado (Holded, Quipu…) o deja que tu gestor las emita. El Dashboard de Stripe te da el registro de todas las ventas (busca por `CMD-XXXXXX`). |
+
+### Resumen: quién hace qué
+
+| Tarea | ¿Quién? |
+|---|---|
+| Alta 036 + RETA | Tú con tu gestor (una vez) |
+| Datos legales en la web | Tú: rellenar `config.mjs` (2 minutos) |
+| Renuncia al desistimiento | ✅ Ya en el código |
+| Aviso legal / privacidad / términos | ✅ Ya generados (revísalos y ajústalos a tu caso) |
+| IVA por país (si creces en UE) | Activar `stripeTax` + alta OSS con gestor |
+| Facturas Verifactu | Gestor o software certificado |
+
+**Ventaja de esta arquitectura**: sin cookies de seguimiento ni analítica no necesitas banner
+de cookies, y al no almacenar tarjetas ni cuentas de usuario, tu superficie de riesgo RGPD es
+mínima (solo email y teléfono, tratados por Stripe y Resend como encargados).
 
 ---
 

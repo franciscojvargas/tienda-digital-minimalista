@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@astrojs/vercel": "^8.0.0",
+    "@astrojs/vercel": "^11.0.3",
     "@tailwindcss/vite": "^4.0.0",
-    "astro": "^5.0.0",
+    "astro": "^7.0.9",
     "exceljs": "^4.4.0",
     "jszip": "^3.10.1",
     "pdf-lib": "^1.17.1",

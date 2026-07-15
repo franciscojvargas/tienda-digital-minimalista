@@ -75,9 +75,30 @@ for (const p of productos) {
     } else {
       fallo(`"${p.nombre ?? p.id}": ruta_pack apunta a "${p.ruta_pack}" pero no existe`);
     }
+  } else if (p.url_descarga) {
+    if (p.url_descarga.startsWith('https://')) {
+      ok(`"${p.nombre ?? p.id}": entrega por enlace directo (url_descarga)`);
+    } else {
+      fallo(`"${p.nombre ?? p.id}": url_descarga debe ser una URL https completa`);
+    }
   } else {
-    aviso(`"${p.nombre ?? p.id}": sin ruta_pack — no se enviará enlace de descarga al comprador`);
+    aviso(`"${p.nombre ?? p.id}": sin ruta_pack ni url_descarga — no se enviará enlace de descarga al comprador`);
   }
+}
+
+// ── 2b. Placeholders de dominio y contacto ────────────────────────────
+console.log('\nDominio y archivos públicos');
+const configAstro = readFileSync('astro.config.mjs', 'utf8');
+if (/const SITIO = 'https:\/\/example\.com'/.test(configAstro)) {
+  fallo('SITIO sigue siendo https://example.com en astro.config.mjs — pon tu dominio real (afecta al sitemap, al SEO y a los dominios permitidos)');
+} else {
+  ok('SITIO configurado en astro.config.mjs');
+}
+if (existsSync('public/robots.txt') && readFileSync('public/robots.txt', 'utf8').includes('example.com')) {
+  aviso('public/robots.txt aún apunta el sitemap a example.com — cámbialo por tu dominio');
+}
+if (existsSync('public/.well-known/security.txt') && readFileSync('public/.well-known/security.txt', 'utf8').includes('example.com')) {
+  aviso('public/.well-known/security.txt tiene el email de ejemplo — pon tu contacto real (y revisa su fecha Expires una vez al año)');
 }
 
 // ── 3. Datos legales ──────────────────────────────────────────────────

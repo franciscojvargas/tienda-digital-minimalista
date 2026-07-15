@@ -40,7 +40,15 @@ const hasta = Math.floor(Date.UTC(anio, numMes, 1) / 1000);
 
 // Formato español: separador ; y coma decimal (abre bien en Excel/gestor).
 const euros = (centimos) => (centimos / 100).toFixed(2).replace('.', ',');
-const campo = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`;
+// Además de entrecomillar, neutraliza la inyección de fórmulas CSV: un
+// email de comprador que empiece por = + - @ o tabulador se ejecutaría
+// como fórmula al abrir el archivo en Excel/Sheets (exfiltración de
+// datos). El apóstrofo inicial hace que se muestre como texto.
+const campo = (v) => {
+  let texto = String(v ?? '').replaceAll('"', '""');
+  if (/^[=+\-@\t\r]/.test(texto)) texto = `'${texto}`;
+  return `"${texto}"`;
+};
 
 console.log(`\n📥 Descargando ventas de ${mes} desde Stripe…`);
 

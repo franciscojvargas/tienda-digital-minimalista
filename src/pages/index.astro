@@ -87,25 +87,30 @@ const faqs = [
     r: 'Sí, a los 7 días, por seguridad. El producto sigue siendo tuyo: escríbenos con tu número de pedido y te reenviamos un enlace nuevo sin coste.',
   },
 ];
+
+// JSON-LD calculado aquí: el global `Astro` no está disponible dentro de
+// las expresiones del template desde Astro 7.
+const urlPack = new URL('/#pack', Astro.site).href;
+const jsonLdProducto = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: pack.nombre,
+  description: pack.descripcion,
+  url: urlPack,
+  image: new URL('/og.png', Astro.site).href,
+  brand: { '@type': 'Brand', name: TIENDA.nombre },
+  offers: {
+    '@type': 'Offer',
+    price: pack.precio,
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+    url: urlPack,
+  },
+});
 ---
 
 <Layout title={`${TIENDA.nombre} — ${TIENDA.titular}`}>
-  <script type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: pack.nombre,
-    description: pack.descripcion,
-    url: new URL('/#pack', Astro.site).href,
-    image: new URL('/og.png', Astro.site).href,
-    brand: { '@type': 'Brand', name: TIENDA.nombre },
-    offers: {
-      '@type': 'Offer',
-      price: pack.precio,
-      priceCurrency: 'EUR',
-      availability: 'https://schema.org/InStock',
-      url: new URL('/#pack', Astro.site).href,
-    },
-  })} />
+  <script type="application/ld+json" set:html={jsonLdProducto} />
 
   <!-- Héroe -->
   <section class="border-b border-stone-200 bg-white">

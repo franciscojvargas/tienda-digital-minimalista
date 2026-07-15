@@ -17,6 +17,24 @@ const destacado = productos[0];
 // URL canónica absoluta de la página actual (site en astro.config.mjs).
 const urlCanonica = new URL(Astro.url.pathname, Astro.site).href;
 const imagenOg = new URL('/og.png', Astro.site).href;
+
+// JSON-LD calculado aquí: el global `Astro` no está disponible dentro de
+// las expresiones del template desde Astro 7.
+const jsonLdSitio = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: TIENDA.nombre,
+  url: Astro.site?.href,
+  description: TIENDA.descripcion,
+  inLanguage: 'es',
+  publisher: {
+    '@type': 'Organization',
+    name: TIENDA.nombre,
+    url: Astro.site?.href,
+    logo: new URL('/apple-touch-icon.png', Astro.site).href,
+    email: TIENDA.emailSoporte,
+  },
+});
 ---
 
 <!doctype html>
@@ -45,21 +63,7 @@ const imagenOg = new URL('/og.png', Astro.site).href;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imagenOg} />
     <title>{title}</title>
-    <script type="application/ld+json" set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: TIENDA.nombre,
-      url: Astro.site?.href,
-      description: TIENDA.descripcion,
-      inLanguage: 'es',
-      publisher: {
-        '@type': 'Organization',
-        name: TIENDA.nombre,
-        url: Astro.site?.href,
-        logo: new URL('/apple-touch-icon.png', Astro.site).href,
-        email: TIENDA.emailSoporte,
-      },
-    })} />
+    <script type="application/ld+json" set:html={jsonLdSitio} />
   </head>
   <body class="min-h-screen bg-stone-50 text-stone-900 antialiased flex flex-col">
     <header class="sticky top-0 z-40 border-b border-stone-200 bg-stone-50/90 backdrop-blur">

@@ -237,9 +237,13 @@ productos-fuente/build/pack/    ← 📁 los archivos que se entregan
 | Descargas piratas | Enlace firmado HMAC que caduca a los 7 días + email del comprador estampado en cada archivo |
 | Enlaces fabricados | Sin `DOWNLOAD_SECRET` es imposible generar un token válido; verificación en tiempo constante |
 | Spam al endpoint de pago | Rechazo por `Origin` ajeno + rate limit por IP + límite de tamaño de petición |
-| Clickjacking / XSS | CSP, `X-Frame-Options: DENY`, `nosniff`, HSTS; datos del comprador escapados en emails |
+| Clickjacking / XSS | CSP endurecida (`object-src 'none'`, `frame-src 'none'`, `upgrade-insecure-requests`), `X-Frame-Options: DENY`, `nosniff`, HSTS con `preload`, `Cross-Origin-Opener-Policy`; datos del comprador escapados en emails |
 | Claves filtradas en git | `.env` en `.gitignore`; variables validadas con `astro:env` |
 | Eventos duplicados | Deduplicación por `event.id` (peor caso: un email repetido — nunca doble cobro) |
+| Contacto de seguridad | `/.well-known/security.txt` (RFC 9116) — pon tu email y renueva `Expires` una vez al año |
+
+`npm run comprobar` avisa además de los placeholders peligrosos (dominio `example.com`
+en `SITIO`, robots.txt y security.txt) antes de que lleguen a producción.
 
 ## 🆘 Problemas frecuentes
 

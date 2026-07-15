@@ -13,7 +13,7 @@ export const TIENDA = {
 
   // Email de soporte que se muestra al comprador (web y emails).
   // El email que RECIBE las alertas de venta se configura en .env (ADMIN_EMAIL).
-  emailSoporte: 'frvagu@gmail.com',
+  emailSoporte: 'hola@tudominio.com',
 
   // Símbolo de moneda mostrado en la web. La moneda real del cobro
   // la define el precio que crees en Stripe.

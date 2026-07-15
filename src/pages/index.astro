@@ -2,47 +2,372 @@
 import Layout from '../layouts/Layout.astro';
 import { productos } from '../lib/productos.js';
 import { TIENDA } from '../config.mjs';
+
+// La tienda vende UN producto destacado (el primero del catálogo).
+// Este modelo "un solo pack, cero decisiones" es el que mejor convierte
+// para productos digitales; si vendes varios, duplica la sección de
+// compra o convierte #pack en un grid.
+const pack = productos[0];
+
+// ✏️ EDITA ESTO: desglose de cada pieza del producto. Es el escaparate
+// real: cuanto más concreto ("7 hojas con el IVA calculándose solo"),
+// más vende. Añade o quita bloques según tu producto.
+const piezas = [
+  {
+    etiqueta: 'Pieza principal · PDF',
+    titulo: 'El nombre de tu pieza principal',
+    intro:
+      'Una o dos frases que expliquen qué es esta pieza y qué problema concreto resuelve. Habla del resultado, no del formato.',
+    detalle: [
+      'Un beneficio concreto y medible de esta pieza',
+      'Otro beneficio, mejor con números o plazos ("en una tarde", "5 plantillas")',
+      'Algo que el comprador teme y esta pieza resuelve',
+      'Un detalle inesperado que demuestra que está bien hecho',
+    ],
+  },
+  {
+    etiqueta: 'Segunda pieza · XLSX',
+    titulo: 'El nombre de tu segunda pieza',
+    intro:
+      'Si tu producto tiene varias partes (plantilla, checklist, bonus…), cada una merece su bloque. Si solo tiene una, borra los bloques sobrantes.',
+    detalle: [
+      'Qué hace exactamente esta pieza',
+      'Cómo se usa (importar, imprimir, rellenar…)',
+      'Qué se lleva el comprador al terminar',
+    ],
+  },
+  {
+    etiqueta: 'Extras · DOCX',
+    titulo: 'Los extras que inclinan la balanza',
+    intro:
+      'Los complementos que convierten "me lo pienso" en "lo compro": checklists, textos listos para copiar, guiones…',
+    detalle: [
+      'Extra 1: qué es y para qué sirve',
+      'Extra 2: qué es y para qué sirve',
+      'Extra 3: qué es y para qué sirve',
+    ],
+  },
+];
+
+// ✏️ EDITA ESTO: el recorrido del comprador en tres pasos.
+const pasos = [
+  {
+    titulo: 'Compra en un minuto',
+    texto:
+      'Pago único con tarjeta a través de Stripe. Sin crear cuenta, sin suscripciones: solo tu email para entregarte el producto.',
+  },
+  {
+    titulo: 'Recíbelo en tu correo',
+    texto:
+      'Al momento de pagar te llega un email con tu número de pedido y tu enlace de descarga personal. Si no aparece, mira en spam.',
+  },
+  {
+    titulo: 'Úsalo hoy mismo',
+    texto:
+      'Descargas el pack completo y empiezas. Es tuyo para siempre: sin plazos, sin accesos que caducan, sin renovaciones.',
+  },
+];
+
+// ✏️ EDITA ESTO: responde las objeciones reales de TU producto.
+const faqs = [
+  {
+    p: '¿Qué recibo exactamente al pagar?',
+    r: 'Un email al momento con tu número de pedido y un enlace de descarga personal del pack completo. El enlace es tuyo — los archivos llevan tu email marcado — y vale 7 días; si lo necesitas después, escríbenos con tu número de pedido y te lo reenviamos al momento.',
+  },
+  {
+    p: '¿Puedo devolverlo?',
+    r: 'Por ley, el contenido digital de descarga inmediata no admite devolución por cambio de opinión (lo aceptas al pagar). Pero si algo no funciona o no es lo que se describe aquí, escríbenos: lo arreglamos o te devolvemos el dinero.',
+  },
+  {
+    p: '¿Es seguro pagar aquí?',
+    r: 'El pago lo procesa Stripe, la misma pasarela que usan Amazon y Shopify. Los datos de tu tarjeta viajan directos a Stripe: nosotros no los vemos ni los guardamos. Solo pedimos tu email, y solo para entregarte el pedido.',
+  },
+  {
+    p: '¿El enlace de descarga caduca?',
+    r: 'Sí, a los 7 días, por seguridad. El producto sigue siendo tuyo: escríbenos con tu número de pedido y te reenviamos un enlace nuevo sin coste.',
+  },
+];
 ---
 
 <Layout title={`${TIENDA.nombre} — ${TIENDA.titular}`}>
-  <section class="mx-auto max-w-5xl px-6 pt-16 pb-10 text-center">
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-balance">
-      {TIENDA.titular}
-    </h1>
-    <p class="mt-4 text-lg text-stone-500 max-w-xl mx-auto">
-      {TIENDA.subtitular}
-    </p>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: pack.nombre,
+    description: pack.descripcion,
+    url: new URL('/#pack', Astro.site).href,
+    image: new URL('/og.png', Astro.site).href,
+    brand: { '@type': 'Brand', name: TIENDA.nombre },
+    offers: {
+      '@type': 'Offer',
+      price: pack.precio,
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      url: new URL('/#pack', Astro.site).href,
+    },
+  })} />
+
+  <!-- Héroe -->
+  <section class="border-b border-stone-200 bg-white">
+    <div class="mx-auto grid max-w-6xl items-center gap-12 px-6 pt-16 pb-14 lg:grid-cols-[1.15fr_1fr] lg:pt-20">
+      <div class="text-center lg:text-left">
+        <p class="kicker">✏️ Una línea que resuma qué incluye · Edición actual</p>
+        <h1 class="font-display mt-4 text-4xl font-semibold tracking-tight text-balance md:text-[3.25rem] md:leading-[1.1]">
+          {TIENDA.titular}
+        </h1>
+        <p class="mt-6 max-w-2xl text-lg leading-relaxed text-stone-600 lg:pr-4">
+          {TIENDA.subtitular}
+        </p>
+        <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          <a
+            href="#pack"
+            class="w-full rounded-lg bg-stone-900 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-almagre-700 sm:w-auto"
+          >
+            Ver el pack completo · {pack.precio} {TIENDA.simboloMoneda}
+          </a>
+          <a
+            href="#faq"
+            class="w-full rounded-lg border border-stone-300 px-7 py-3.5 text-sm font-semibold text-stone-700 transition hover:border-almagre-700 hover:text-almagre-700 sm:w-auto"
+          >
+            Preguntas frecuentes
+          </a>
+        </div>
+        <p class="mt-6 text-xs text-stone-400">
+          Pago único · IVA incluido · Sin registro ni suscripciones · Tuyo para siempre
+        </p>
+      </div>
+
+      <!-- Tarjeta: qué hay dentro del pack -->
+      <a href="#pack" class="group block rounded-2xl border border-stone-200 bg-stone-50 shadow-sm transition hover:border-almagre-600 hover:shadow-md">
+        <div class="flex items-center justify-between rounded-t-2xl border-b border-stone-200 bg-stone-900 px-6 py-4 text-white">
+          <span class="text-sm font-semibold">{pack.nombre}</span>
+          <span class="font-display text-lg font-semibold">{pack.precio} {TIENDA.simboloMoneda}</span>
+        </div>
+        <ul class="divide-y divide-stone-200 text-sm">
+          <li class="flex items-start gap-3 px-6 py-4">
+            <span class="mt-0.5 rounded bg-almagre-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-almagre-800">PDF</span>
+            <span><b>Pieza principal</b> — ✏️ resumen en una línea de la pieza principal</span>
+          </li>
+          <li class="flex items-start gap-3 px-6 py-4">
+            <span class="mt-0.5 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">XLSX</span>
+            <span><b>Segunda pieza</b> — ✏️ resumen en una línea de la segunda pieza</span>
+          </li>
+          <li class="flex items-start gap-3 px-6 py-4">
+            <span class="mt-0.5 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-800">DOCX</span>
+            <span><b>Los extras</b> — ✏️ resumen en una línea de los extras</span>
+          </li>
+        </ul>
+        <p class="rounded-b-2xl border-t border-stone-200 bg-white px-6 py-3.5 text-center text-xs font-semibold text-almagre-700 transition group-hover:text-almagre-800">
+          Ver el desglose completo ↓
+        </p>
+      </a>
+    </div>
   </section>
 
-  <section class="mx-auto max-w-5xl px-6 pb-20">
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {productos.map((producto) => (
-        <article class="group flex flex-col rounded-2xl border border-stone-200 bg-white p-7 shadow-sm transition hover:shadow-md hover:border-emerald-200">
-          <h2 class="text-lg font-semibold tracking-tight">{producto.nombre}</h2>
-          <p class="mt-3 text-sm leading-relaxed text-stone-500 flex-1">{producto.descripcion}</p>
-          <div class="mt-6 flex items-baseline gap-1">
-            <span class="text-3xl font-bold">{producto.precio}{TIENDA.simboloMoneda}</span>
-            <span class="text-xs text-stone-400">pago único</span>
-          </div>
-          <button
-            type="button"
-            class="btn-comprar mt-5 w-full rounded-xl bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-emerald-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-wait"
-            data-producto-id={producto.id}
-          >
-            Comprar ahora
-          </button>
-        </article>
-      ))}
+  <!-- El problema, dicho en voz alta -->
+  <section class="border-b border-stone-200 bg-stone-50">
+    <div class="mx-auto max-w-3xl px-6 py-14">
+      <p class="font-display text-xl leading-relaxed text-stone-700 md:text-2xl">
+        ✏️ Nombra aquí, en voz alta, el problema exacto que tiene tu comprador.
+        El que le hace posponer, dudar o pagar de más. <em>Si se reconoce en esta
+        frase, sigue leyendo.</em>
+      </p>
+      <p class="mt-5 text-stone-600 leading-relaxed">
+        Y aquí, en tono sereno, la solución: por qué este producto lo resuelve, qué
+        hace distinto, y por qué quien lo compra deja de tener ese problema. Dos o
+        tres frases honestas valen más que diez superlativos.
+      </p>
     </div>
+  </section>
 
-    <p class="mt-10 text-center text-xs text-stone-400">
-      Serás redirigido a Stripe para completar el pago de forma segura. No almacenamos datos de tu tarjeta.
-    </p>
+  <!-- Cómo funciona -->
+  <section class="border-b border-stone-200 bg-white">
+    <div class="mx-auto max-w-5xl px-6 py-16">
+      <p class="kicker text-center">Cómo funciona</p>
+      <h2 class="font-display mt-3 text-center text-3xl font-semibold tracking-tight">De la compra al resultado, en tres pasos</h2>
+      <div class="mt-12 grid gap-10 sm:grid-cols-3">
+        {pasos.map((paso, indice) => (
+          <div>
+            <span class="font-display text-4xl font-semibold text-almagre-200">{String(indice + 1).padStart(2, '0')}</span>
+            <h3 class="mt-3 font-semibold tracking-tight">{paso.titulo}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone-500">{paso.texto}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- El pack, pieza a pieza -->
+  <section id="pack" class="scroll-mt-20 border-b border-stone-200 bg-stone-50">
+    <div class="mx-auto max-w-5xl px-6 py-16">
+      <p class="kicker text-center">El producto</p>
+      <h2 class="font-display mt-3 text-center text-3xl font-semibold tracking-tight">Un solo pack, todo incluido</h2>
+      <p class="mx-auto mt-4 max-w-xl text-center text-stone-500">
+        Sin suscripciones, sin «módulo avanzado» que comprar después. Todo lo que
+        hace falta, junto, una vez.
+      </p>
+
+      <div class="mt-12 space-y-6">
+        {piezas.map((pieza) => (
+          <article class="rounded-2xl border border-stone-200 bg-white p-8 sm:p-10">
+            <p class="kicker">{pieza.etiqueta}</p>
+            <h3 class="font-display mt-2 text-2xl font-semibold tracking-tight">{pieza.titulo}</h3>
+            <p class="mt-3 max-w-3xl text-sm leading-relaxed text-stone-600">{pieza.intro}</p>
+            <ul class="mt-5 grid gap-x-8 gap-y-2.5 text-sm text-stone-600 md:grid-cols-2">
+              {pieza.detalle.map((linea) => (
+                <li class="flex gap-2.5">
+                  <svg class="mt-1 h-3.5 w-3.5 shrink-0 text-almagre-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  <span>{linea}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <!-- Extracto real: enseña un trozo del producto. Nada vende más
+           que ver la mercancía. Si no encaja con tu producto, bórralo. -->
+      <figure class="mt-12 rounded-2xl border border-almagre-200 bg-almagre-50 p-8 sm:p-10">
+        <p class="kicker">Un extracto real del producto</p>
+        <blockquote class="font-display mt-4 text-lg leading-relaxed text-stone-700">
+          «✏️ Pega aquí un párrafo literal de tu producto: el mejor que tengas, el
+          que hace pensar "si esto es la muestra gratis, quiero el resto". Cita
+          textual, sin retocar — la honestidad se nota.»
+        </blockquote>
+        <figcaption class="mt-4 text-xs text-stone-500">✏️ De dónde sale el extracto (capítulo, hoja, sección)</figcaption>
+      </figure>
+
+      <!-- Precio y compra -->
+      <div class="mx-auto mt-12 max-w-2xl rounded-2xl border-2 border-stone-900 bg-white p-8 text-center sm:p-10">
+        <p class="kicker">{pack.nombre}</p>
+        <div class="mt-4 flex items-baseline justify-center gap-3">
+          <span class="font-display text-6xl font-semibold">{pack.precio} {TIENDA.simboloMoneda}</span>
+          <span class="text-left text-xs leading-snug text-stone-400">pago único<br />IVA incluido</span>
+        </div>
+        {pack.incluye && (
+          <ul class="mx-auto mt-6 max-w-md space-y-2 text-left text-sm text-stone-600">
+            {pack.incluye.map((linea) => (
+              <li class="flex gap-2.5">
+                <svg class="mt-1 h-3.5 w-3.5 shrink-0 text-almagre-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span>{linea}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="button"
+          class="btn-comprar mt-8 w-full rounded-lg bg-stone-900 px-5 py-4 text-base font-semibold text-white transition hover:bg-almagre-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-almagre-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-50"
+          data-producto-id={pack.id}
+        >
+          Comprar el pack completo
+        </button>
+        <p class="mt-4 text-xs text-stone-400">
+          Descarga inmediata en tu correo tras el pago · Pago seguro procesado por Stripe ·
+          No almacenamos datos de tu tarjeta
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quién está detrás: la sección que más confianza genera en tiendas
+       de una sola persona. Cuenta tu historia real. -->
+  <section class="border-b border-stone-200 bg-white">
+    <div class="mx-auto max-w-3xl px-6 py-16">
+      <p class="kicker">Quién está detrás</p>
+      <h2 class="font-display mt-3 text-2xl font-semibold tracking-tight">✏️ Un titular sobre ti y por qué haces esto</h2>
+      <div class="mt-5 space-y-4 text-stone-600 leading-relaxed">
+        <p>
+          ✏️ Primer párrafo: quién eres y qué te llevó a crear este producto.
+          Las tiendas pequeñas venden por confianza, y la confianza se construye
+          dando la cara.
+        </p>
+        <p>
+          ✏️ Segundo párrafo: qué hay detrás del producto — la experiencia, el
+          trabajo o el camino recorrido que lo respalda. Concreto y verificable
+          gana a grandilocuente.
+        </p>
+        <p class="text-sm text-stone-500">
+          ¿Dudas antes de comprar? Escríbenos a
+          <a href={`mailto:${TIENDA.emailSoporte}`} class="underline underline-offset-2 hover:text-almagre-700">{TIENDA.emailSoporte}</a>
+          — contestamos personalmente.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Para quién es: decir honestamente a quién NO le sirve
+       aumenta la conversión de quienes sí encajan. -->
+  <section class="border-b border-stone-200 bg-stone-50">
+    <div class="mx-auto max-w-4xl px-6 py-16">
+      <h2 class="font-display text-center text-2xl font-semibold tracking-tight">¿Es para ti?</h2>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2">
+        <div class="rounded-2xl border border-stone-200 bg-white p-7">
+          <p class="font-semibold text-emerald-700">Sí, si…</p>
+          <ul class="mt-4 space-y-2.5 text-sm leading-relaxed text-stone-600">
+            <li>✏️ El perfil exacto de tu comprador ideal.</li>
+            <li>✏️ La situación en la que está ahora mismo.</li>
+            <li>✏️ Lo que quiere conseguir y este producto le da.</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl border border-stone-200 bg-white p-7">
+          <p class="font-semibold text-stone-500">No, si…</p>
+          <ul class="mt-4 space-y-2.5 text-sm leading-relaxed text-stone-600">
+            <li>✏️ A quién no le sirve, dicho sin rodeos.</li>
+            <li>✏️ Qué esperaría alguien que va a decepcionarse.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Preguntas frecuentes -->
+  <section id="faq" class="scroll-mt-20 border-b border-stone-200 bg-white">
+    <div class="mx-auto max-w-3xl px-6 py-16">
+      <h2 class="font-display text-center text-2xl font-semibold tracking-tight">Preguntas frecuentes</h2>
+      <div class="mt-8 space-y-3">
+        {faqs.map((faq) => (
+          <details class="group rounded-xl border border-stone-200 bg-stone-50 open:bg-white">
+            <summary class="flex cursor-pointer items-center justify-between gap-3 p-5 text-sm font-semibold marker:content-none [&::-webkit-details-marker]:hidden">
+              {faq.p}
+              <svg class="h-4 w-4 shrink-0 text-stone-400 transition group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </summary>
+            <p class="px-5 pb-5 text-sm leading-relaxed text-stone-600">{faq.r}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Cierre -->
+  <section class="bg-stone-900 text-stone-50">
+    <div class="mx-auto max-w-3xl px-6 py-16 text-center">
+      <h2 class="font-display text-3xl font-semibold tracking-tight text-balance">
+        ✏️ La frase de cierre: el coste de seguir sin resolver el problema.
+      </h2>
+      <p class="mx-auto mt-4 max-w-xl text-stone-300">
+        ✏️ Y el empujón final: qué se lleva por el precio de qué (una comparación
+        cotidiana funciona bien) y qué pone él.
+      </p>
+      <button
+        type="button"
+        class="btn-comprar mt-8 rounded-lg bg-white px-8 py-4 text-base font-semibold text-stone-900 transition hover:bg-almagre-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900 disabled:cursor-wait disabled:opacity-50"
+        data-producto-id={pack.id}
+      >
+        Comprar el pack completo · {pack.precio} {TIENDA.simboloMoneda}
+      </button>
+      <p class="mt-4 text-xs text-stone-400">Pago único · IVA incluido · Descarga inmediata</p>
+    </div>
   </section>
 </Layout>
 
 <script>
-  // Al pulsar "Comprar ahora" pedimos al endpoint serverless una sesión de
+  // Al pulsar "Comprar" pedimos al endpoint serverless una sesión de
   // Stripe Checkout y redirigimos. Ningún dato sensible pasa por este sitio.
   document.querySelectorAll<HTMLButtonElement>('.btn-comprar').forEach((boton) => {
     boton.addEventListener('click', async () => {

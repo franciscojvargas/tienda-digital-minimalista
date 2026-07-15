@@ -2,3 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /gracias
 Disallow: /api/
+
+# ⚠️ Cambia example.com por tu dominio (el mismo SITIO de astro.config.mjs)
+Sitemap: https://example.com/sitemap-index.xml

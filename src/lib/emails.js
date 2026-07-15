@@ -14,8 +14,8 @@ const estilosBase = `
 
 /**
  * Escapa caracteres HTML en cualquier valor dinámico antes de
- * interpolarlo en las plantillas (email/teléfono los escribe el
- * comprador en Stripe; el resto, por higiene y a prueba de futuro).
+ * interpolarlo en las plantillas (el email lo escribe el comprador en
+ * Stripe; el resto, por higiene y a prueba de futuro).
  */
 function esc(valor) {
   return String(valor)
@@ -52,16 +52,27 @@ async function enviar(opciones) {
  * Email de confirmación al comprador: producto, número de pedido,
  * botón de descarga (si el producto lo tiene) y soporte.
  */
-export async function enviarEmailComprador({ emailComprador, numeroPedido, nombreProducto, importe, enlaceDescarga }) {
+export async function enviarEmailComprador({ emailComprador, numeroPedido, nombreProducto, importe, enlaceDescarga, enlaceFirmado = false }) {
+  // La nota de caducidad y marcado solo aplica a los packs firmados
+  // (ruta_pack); con url_descarga el enlace es directo y permanente.
+  const notaEnlace = enlaceFirmado
+    ? `
+      <p style="font-size: 12px; color: #a8a29e; text-align: center; margin-top: -16px;">
+        Enlace personal e intransferible, válido 7 días. Los archivos llevan tu email
+        marcado: son para tu uso, no para compartir.
+      </p>
+    `
+    : '';
   const bloqueDescarga = enlaceDescarga
     ? `
       <div style="text-align: center; margin: 28px 0;">
         <a href="${esc(enlaceDescarga)}"
-           style="display: inline-block; background: #059669; color: #ffffff; text-decoration: none;
+           style="display: inline-block; background: #ea580c; color: #ffffff; text-decoration: none;
                   padding: 14px 32px; border-radius: 10px; font-weight: 600;">
           Descargar tu producto
         </a>
       </div>
+      ${notaEnlace}
     `
     : `
       <p style="background: #f5f5f4; border-radius: 10px; padding: 14px 16px; font-size: 14px;">
@@ -72,6 +83,9 @@ export async function enviarEmailComprador({ emailComprador, numeroPedido, nombr
   return enviar({
     from: remitente,
     to: emailComprador,
+    // Si el comprador responde a este email, la respuesta llega al
+    // buzón de soporte (config.mjs), no al remitente técnico.
+    replyTo: TIENDA.emailSoporte,
     subject: `Confirmación de tu pedido ${numeroPedido}`,
     html: `
       <div style="${estilosBase}">
@@ -97,7 +111,7 @@ export async function enviarEmailComprador({ emailComprador, numeroPedido, nombr
  * Email de alerta al administrador: datos del comprador,
  * producto vendido y número de pedido.
  */
-export async function enviarEmailAdmin({ emailComprador, telefonoComprador, numeroPedido, nombreProducto, importe }) {
+export async function enviarEmailAdmin({ emailComprador, numeroPedido, nombreProducto, importe }) {
   return enviar({
     from: remitente,
     to: emailAdmin,
@@ -110,7 +124,6 @@ export async function enviarEmailAdmin({ emailComprador, telefonoComprador, nume
           ${fila('Producto', esc(nombreProducto))}
           ${fila('Importe', `${esc(importe)} €`)}
           ${fila('Email del comprador', esc(emailComprador ?? 'No disponible'))}
-          ${fila('Teléfono del comprador', telefonoComprador ? esc(telefonoComprador) : 'No facilitado')}
         </table>
       </div>
     `,

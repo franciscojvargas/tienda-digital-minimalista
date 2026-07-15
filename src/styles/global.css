@@ -1,15 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  /* Fuentes de sistema: cero descargas, cero FOUT, render inmediato. */
+  /* Fuentes de sistema: cero descargas, cero FOUT, render inmediato.
+     La serif de los titulares da el tono editorial (libro, no landing de humo). */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, Cambria, serif;
+
+  /* Acento de marca: almagre, el rojo tierra clásico. Serio y cálido a la vez. */
+  --color-almagre-50: #fdf5f3;
+  --color-almagre-100: #fbe7e1;
+  --color-almagre-200: #f6cfc4;
+  --color-almagre-600: #b6462b;
+  --color-almagre-700: #9a3a22;
+  --color-almagre-800: #7c2f1d;
+  --color-almagre-900: #64271a;
+}
+
+/* Etiqueta pequeña en versalitas que precede a los titulares de sección. */
+.kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-almagre-700);
 }
 
 /* Prosa de las páginas legales (aviso legal, privacidad, términos). */
 .prosa-legal h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   margin-bottom: 0.5rem;
 }
 .prosa-legal h2 {
@@ -32,4 +53,5 @@
 }
 .prosa-legal a {
   text-decoration: underline;
+  text-underline-offset: 2px;
 }

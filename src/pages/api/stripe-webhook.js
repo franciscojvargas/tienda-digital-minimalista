@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
-import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from 'astro:env/server';
+import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, DOWNLOAD_SECRET } from 'astro:env/server';
 import { enviarEmailComprador, enviarEmailAdmin } from '../../lib/emails.js';
 import { buscarProducto } from '../../lib/productos.js';
+import { crearTokenDescarga } from '../../lib/descargas.js';
 
 // Endpoint serverless: Stripe lo llama directamente, nunca el navegador.
 export const prerender = false;
@@ -64,15 +65,32 @@ export async function POST({ request }) {
   const numeroPedido = sesion.metadata?.numero_pedido ?? 'DESCONOCIDO';
   const nombreProducto = sesion.metadata?.producto_nombre ?? 'Producto digital';
   const emailComprador = sesion.customer_details?.email;
-  const telefonoComprador = sesion.customer_details?.phone;
   const importe = typeof sesion.amount_total === 'number'
     ? (sesion.amount_total / 100).toFixed(2)
     : '—';
 
-  // Si el producto tiene url_descarga en productos.json, el email del
-  // comprador incluirá el botón de descarga. Entrega automática sin DB.
+  // Enlace de descarga firmado: solo quien tiene este token exacto (el
+  // comprador, por email) puede generar el ZIP, y caduca solo. Nadie
+  // puede fabricar uno válido sin DOWNLOAD_SECRET, y el archivo que
+  // descarga lleva su email estampado en cada página (api/descargar.js).
+  // No hay URL fija ni "carpeta secreta" que filtrar: sin producto o sin
+  // email de la sesión, simplemente no hay enlace que mandar.
   const producto = buscarProducto(sesion.metadata?.producto_id);
-  const enlaceDescarga = producto?.url_descarga;
+  let enlaceDescarga;
+  let enlaceFirmado = false;
+  if (producto?.ruta_pack && emailComprador) {
+    const token = crearTokenDescarga({
+      productoId: producto.id,
+      numeroPedido,
+      email: emailComprador,
+      secreto: DOWNLOAD_SECRET,
+    });
+    enlaceDescarga = `${new URL(request.url).origin}/api/descargar?token=${encodeURIComponent(token)}`;
+    enlaceFirmado = true;
+  } else if (producto?.url_descarga) {
+    // Entrega simple: enlace directo tal cual (sin token ni marcado).
+    enlaceDescarga = producto.url_descarga;
+  }
 
   console.log(`[stripe-webhook] Venta confirmada ${numeroPedido} (evento ${evento.id})`);
 
@@ -80,9 +98,9 @@ export async function POST({ request }) {
   // se envía igualmente y el fallo queda registrado en los logs.
   const resultados = await Promise.allSettled([
     emailComprador
-      ? enviarEmailComprador({ emailComprador, numeroPedido, nombreProducto, importe, enlaceDescarga })
+      ? enviarEmailComprador({ emailComprador, numeroPedido, nombreProducto, importe, enlaceDescarga, enlaceFirmado })
       : Promise.reject(new Error('La sesión no incluye email del comprador')),
-    enviarEmailAdmin({ emailComprador, telefonoComprador, numeroPedido, nombreProducto, importe }),
+    enviarEmailAdmin({ emailComprador, numeroPedido, nombreProducto, importe }),
   ]);
 
   resultados.forEach((resultado, indice) => {

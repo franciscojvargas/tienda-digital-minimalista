@@ -2,8 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import { TIENDA } from '../config.mjs';
 // Plantilla genérica de política de privacidad (RGPD + LOPDGDD),
-// ajustada a lo que esta tienda realmente hace: solo email y teléfono
-// para procesar el pedido. Punto de partida, no asesoramiento jurídico.
+// ajustada a lo que esta tienda realmente hace: solo email para
+// procesar el pedido. Punto de partida, no asesoramiento jurídico.
 const { legal } = TIENDA;
 ---
 
@@ -21,9 +21,10 @@ const { legal } = TIENDA;
 
     <h2>2. Qué datos tratamos y para qué</h2>
     <p>
-      Esta tienda pide los datos mínimos imprescindibles para completar una compra: tu
-      <strong>correo electrónico</strong> y tu <strong>número de teléfono</strong>, que
-      introduces directamente en la pasarela de pago de Stripe. Se usan exclusivamente para:
+      Esta tienda pide el dato mínimo imprescindible para completar una compra: tu
+      <strong>correo electrónico</strong>, que introduces directamente en la pasarela de
+      pago de Stripe. No pedimos teléfono, dirección ni ningún otro dato. Tu email se usa
+      exclusivamente para:
     </p>
     <ul>
       <li>Procesar el pago y entregarte el producto adquirido.</li>
@@ -32,7 +33,10 @@ const { legal } = TIENDA;
     </ul>
     <p>
       No usamos tus datos para publicidad, no los vendemos y este sitio no utiliza cookies
-      propias ni de seguimiento.
+      propias ni de seguimiento. No tenemos base de datos propia de compradores: el único
+      registro de tu compra es el que guarda Stripe como procesador de pago, y tu email
+      queda además marcado en los archivos que descargas — es tu copia personal, por eso
+      pedimos que no se comparta.
     </p>
 
     <h2>3. Base legal</h2>

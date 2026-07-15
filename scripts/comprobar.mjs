@@ -30,6 +30,7 @@ if (!existsSync('.env')) {
 const claveStripe = process.env.STRIPE_SECRET_KEY ?? '';
 const claveWebhook = process.env.STRIPE_WEBHOOK_SECRET ?? '';
 const claveResend = process.env.RESEND_API_KEY ?? '';
+const claveDescargas = process.env.DOWNLOAD_SECRET ?? '';
 
 if (!claveStripe.startsWith('sk_') || claveStripe.includes('xxxx')) {
   fallo('STRIPE_SECRET_KEY sin rellenar (debe empezar por sk_test_ o sk_live_)');
@@ -49,6 +50,11 @@ if (!claveResend.startsWith('re_') || claveResend.includes('xxxx')) {
 if (!process.env.FROM_EMAIL) {
   aviso('FROM_EMAIL sin definir: los emails saldrán de onboarding@resend.dev (solo llegan a tu propio correo)');
 }
+if (claveDescargas.length < 32 || claveDescargas.includes('xxxx')) {
+  fallo('DOWNLOAD_SECRET sin rellenar o demasiado corta (genera una con `openssl rand -hex 32`)');
+} else {
+  ok('DOWNLOAD_SECRET presente');
+}
 
 // ── 2. Catálogo de productos ──────────────────────────────────────────
 console.log('\nCatálogo (src/data/productos.json)');
@@ -63,8 +69,14 @@ for (const p of productos) {
   if (!p.stripe_price_id || p.stripe_price_id.includes('REEMPLAZAR')) {
     fallo(`"${p.nombre ?? p.id}": stripe_price_id es un placeholder — crea el precio en Stripe y copia el price_...`);
   }
-  if (p.url_descarga?.includes('example.com')) {
-    aviso(`"${p.nombre ?? p.id}": url_descarga apunta a example.com — pon la URL real de tu archivo (o quita el campo)`);
+  if (p.ruta_pack) {
+    if (existsSync(p.ruta_pack)) {
+      ok(`"${p.nombre ?? p.id}": carpeta del pack presente (${p.ruta_pack})`);
+    } else {
+      fallo(`"${p.nombre ?? p.id}": ruta_pack apunta a "${p.ruta_pack}" pero no existe`);
+    }
+  } else {
+    aviso(`"${p.nombre ?? p.id}": sin ruta_pack — no se enviará enlace de descarga al comprador`);
   }
 }
 
@@ -134,6 +146,10 @@ if (claveResend.startsWith('re_') && !claveResend.includes('xxxx')) {
       } else {
         ok(`Dominio(s) verificado(s): ${verificados.map((d) => d.name).join(', ')}`);
       }
+    } else if (res.status === 401) {
+      // Las claves con permiso "Sending access" no pueden listar dominios,
+      // pero envían perfectamente: no es un error de clave.
+      aviso('Clave de Resend con permiso de solo envío: no puedo comprobar el dominio desde aquí — verifica en resend.com/domains que aparece "Verified"');
     } else {
       fallo(`La clave de Resend no funciona (HTTP ${res.status})`);
     }

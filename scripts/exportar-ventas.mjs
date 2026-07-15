@@ -64,7 +64,6 @@ try {
       campo(sesion.total_details?.amount_tax != null ? euros(sesion.total_details.amount_tax) : ''),
       campo((sesion.currency ?? 'eur').toUpperCase()),
       campo(sesion.customer_details?.email ?? ''),
-      campo(sesion.customer_details?.phone ?? ''),
       campo(sesion.customer_details?.address?.country ?? ''),
       campo(sesion.id),
     ].join(';'));
@@ -82,7 +81,7 @@ if (filas.length === 0) {
 
 const cabecera = [
   'fecha', 'pedido', 'producto', 'total_eur', 'impuestos_incluidos_eur',
-  'moneda', 'email_comprador', 'telefono_comprador', 'pais_comprador', 'id_sesion_stripe',
+  'moneda', 'email_comprador', 'pais_comprador', 'id_sesion_stripe',
 ].join(';');
 
 const archivo = `ventas-${mes}.csv`;

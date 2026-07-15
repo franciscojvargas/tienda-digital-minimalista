@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { randomUUID } from 'node:crypto';
 import { STRIPE_SECRET_KEY } from 'astro:env/server';
 import { buscarProducto } from '../../lib/productos.js';
+import { crearLimitador } from '../../lib/rateLimit.js';
 import { TIENDA } from '../../config.mjs';
 
 // Endpoint serverless: se ejecuta bajo demanda, nunca se prerenderiza.
@@ -9,28 +10,7 @@ export const prerender = false;
 
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
-// ── Rate limiting en memoria (best-effort, sin base de datos) ─────────
-// Vive mientras la función serverless esté "caliente". No es perfecto
-// entre instancias, pero corta en seco el abuso desde una misma IP
-// sin añadir infraestructura. Fallo inofensivo: si se reinicia, solo
-// se reinicia el contador.
-const LIMITE_PETICIONES = 10; // por IP
-const VENTANA_MS = 60_000; // por minuto
-const contadores = new Map();
-
-function superaLimite(ip) {
-  const ahora = Date.now();
-  // Evita crecimiento sin límite de memoria en instancias muy longevas.
-  if (contadores.size > 5_000) contadores.clear();
-
-  const registro = contadores.get(ip);
-  if (!registro || ahora > registro.reinicio) {
-    contadores.set(ip, { cuenta: 1, reinicio: ahora + VENTANA_MS });
-    return false;
-  }
-  registro.cuenta += 1;
-  return registro.cuenta > LIMITE_PETICIONES;
-}
+const superaLimite = crearLimitador({ limite: 10, ventanaMs: 60_000 }); // 10 peticiones/min por IP
 
 function respuestaJson(cuerpo, status) {
   return new Response(JSON.stringify(cuerpo), {
@@ -108,15 +88,19 @@ export async function POST({ request, clientAddress }) {
       payment_method_types: ['card'],
       line_items: [{ price: producto.stripe_price_id, quantity: 1 }],
 
-      // Solo pedimos email (automático en Checkout) y teléfono.
-      // Producto digital: sin dirección de envío ni de facturación.
-      phone_number_collection: { enabled: true },
+      // Muestra el campo de código promocional en Checkout. Sin esto,
+      // los cupones creados en el Dashboard nunca son canjeables.
+      allow_promotion_codes: true,
+
+      // Solo pedimos el email (automático en Checkout). Nada de teléfono
+      // ni direcciones: para entregar un producto digital basta un
+      // correo, y no recogemos ni guardamos ningún otro dato personal.
       billing_address_collection: 'auto',
       submit_type: 'pay',
 
-      // Las sesiones abandonadas caducan a los 30 min (mínimo de Stripe)
-      // en lugar de las 24 h por defecto.
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+      // Las sesiones abandonadas caducan a los ~30 min (mínimo de Stripe;
+      // 31 para no rozar el límite si hay desfase de reloj) en lugar de 24 h.
+      expires_at: Math.floor(Date.now() / 1000) + 31 * 60,
 
       // Visible en el Dashboard de Stripe: permite buscar por pedido.
       client_reference_id: numeroPedido,
